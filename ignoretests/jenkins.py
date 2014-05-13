@@ -1,13 +1,16 @@
 #!/usr/bin/python
-from django.test.simple import reorder_suite, build_test, build_suite
+from django.test.simple import build_test, build_suite
 from django.db.models import get_apps, get_app
 from django.test.testcases import TestCase
 import unittest
 from django.conf import settings
-
-
 from django_jenkins.runner import CITestSuiteRunner
-#from django_jenkins import signals
+
+try:
+    from django.test.simple import reorder_suite
+
+except ImportError:
+    from django.test.runner import reorder_suite
 
 class JenkinsIgnoreTestSuiteRunner(CITestSuiteRunner):
     def build_suite(self, test_labels, extra_tests=None, **kwargs):
@@ -35,5 +38,5 @@ class JenkinsIgnoreTestSuiteRunner(CITestSuiteRunner):
                     suite.addTest(build_suite(app))
 
         suite = reorder_suite(suite, (TestCase,))
-        # signals.build_suite.send(sender=self, suite=suite)
+
         return suite
